@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Scanner;
 
 public class FileReaderDemo {
 
@@ -76,7 +77,9 @@ public class FileReaderDemo {
 
     public static void main(String[] args) {
 
-        String fileName = "C:\\Users\\barca\\OneDrive\\Masaüstü\\de12\\SE115_Project\\src\\map1.txt";
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter The File Path: ");
+        String fileName = input.nextLine();
         FileReaderDemo fileReader = new FileReaderDemo();
         boolean success = fileReader.readInputFile(fileName);
 

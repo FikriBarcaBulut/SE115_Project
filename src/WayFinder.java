@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class WayFinder {
     private CountryMap map;
 
@@ -5,7 +8,7 @@ public class WayFinder {
         this.map = map;
     }
 
-    public void findShortestPath(String startCity, String endCity) {
+    public void findShortestPath(String startCity, String endCity, String outputFile) {
         int numCities = map.getAllCities().length;
         String[] cityNames = new String[numCities];
         int[] distances = new int[numCities];
@@ -22,7 +25,7 @@ public class WayFinder {
 
         int startIndex = getCityIndex(cityNames, startCity);
         if (startIndex == -1) {
-            System.out.println("Start City Not Found.");
+            System.out.println("Start city not found.");
             return;
         }
         distances[startIndex] = 0;
@@ -30,10 +33,8 @@ public class WayFinder {
         for (int i = 0; i < numCities; i++) {
             int currentCityIndex = getClosestCityIndex(distances, visited);
             if (currentCityIndex == -1) break;
-
             visited[currentCityIndex] = true;
             Cities currentCity = map.getAllCities()[currentCityIndex];
-
             for (int j = 0; j < currentCity.getNeighborCount(); j++) {
                 String neighborName = currentCity.getNeighbors()[j];
                 int travelTime = currentCity.getTravelTimes()[j];
@@ -48,7 +49,7 @@ public class WayFinder {
                 }
             }
         }
-        printShortestPath(cityNames, distances, previous, startCity, endCity);
+        writeEverythingToFile(cityNames, distances, previous, startCity, endCity, outputFile);
     }
 
     private int getCityIndex(String[] cityNames, String cityName) {
@@ -72,20 +73,50 @@ public class WayFinder {
         return minIndex;
     }
 
-    private void printShortestPath(String[] cityNames, int[] distances, String[] previous, String startCity, String endCity) {
+    private void writeEverythingToFile(String[] cityNames, int[] distances, String[] previous, String startCity, String endCity, String outputFile) {
         int endIndex = getCityIndex(cityNames, endCity);
-        if (endIndex == -1 || distances[endIndex] == Integer.MAX_VALUE) {
-            System.out.println("No Path Found From " + startCity + " to " + endCity);
-            return;
+        StringBuilder outputBuilder = new StringBuilder();
+
+        outputBuilder.append("========================================\n");
+        outputBuilder.append("              MAP STRUCTURE             \n");
+        outputBuilder.append("========================================\n");
+
+        for (Cities city : map.getAllCities()) {
+            if (city != null) {
+                outputBuilder.append(city).append("\n");
+            }
         }
 
-        String path = endCity;
-        String currentCity = previous[endIndex];
-        while (currentCity != null) {
-            path = currentCity + " >>> " + path;
-            currentCity = previous[getCityIndex(cityNames, currentCity)];
+        outputBuilder.append("========================================\n");
+
+        if (endIndex == -1 || distances[endIndex] == Integer.MAX_VALUE) {
+            outputBuilder.append("No Path Found From ").append(startCity).append(" to ").append(endCity).append("\n");
+        } else {
+            StringBuilder pathBuilder = new StringBuilder(endCity);
+            String currentCity = previous[endIndex];
+            while (currentCity != null) {
+                pathBuilder.insert(0, currentCity + " -> ");
+                currentCity = previous[getCityIndex(cityNames, currentCity)];
+            }
+
+            String path = pathBuilder.toString();
+            int totalTime = distances[endIndex];
+
+            outputBuilder.append("========================================\n");
+            outputBuilder.append("              FASTEST ROUTE             \n");
+            outputBuilder.append("========================================\n");
+            outputBuilder.append("Start City       : ").append(startCity).append("\n");
+            outputBuilder.append("End City         : ").append(endCity).append("\n");
+            outputBuilder.append("Fastest Route    : ").append(path).append("\n");
+            outputBuilder.append("Total Travel Time: ").append(totalTime).append(" min\n");
+            outputBuilder.append("========================================\n");
         }
-        System.out.println("Fastest Way: " + path);
-        System.out.println("Total Time: " + distances[endIndex] + " min");
+
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.write(outputBuilder.toString());
+            System.out.println("Result Written to " + outputFile);
+        } catch (IOException e) {
+            System.out.println("Error Writing to File: " + e.getMessage());
+        }
     }
 }

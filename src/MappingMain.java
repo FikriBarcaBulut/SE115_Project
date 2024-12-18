@@ -1,19 +1,28 @@
 public class MappingMain {
     public static void main(String[] args) {
+
         if (args.length < 1) {
             System.out.println("You Must Enter a File Name");
             return;
         }
 
+        String inputFileName = args[0];
+        String baseFileName = inputFileName;
+        if (inputFileName.contains(".")) {
+            baseFileName = inputFileName.substring(0, inputFileName.lastIndexOf('.'));
+        }
+        String outputFileName = "outputOf" + baseFileName + ".txt";
+
         FileReaderDemo fileReader = new FileReaderDemo();
-        if (!fileReader.readInputFile(args[0])) {
-            System.out.println("Error Reading The Input File");
+        if (!fileReader.readInputFile(inputFileName)) {
+            System.out.println("Error Reading The Input File.");
             return;
         }
 
         int numCities = fileReader.getNumCities();
         CountryMap map = new CountryMap(numCities);
         String[] cities = fileReader.getCities();
+
         for (int i = 0; i < numCities; i++) {
             map.addCity(cities[i], 10);
         }
@@ -27,6 +36,6 @@ public class MappingMain {
         }
 
         WayFinder wayFinder = new WayFinder(map);
-        wayFinder.findShortestPath(fileReader.getStartCity(), fileReader.getEndCity());
+        wayFinder.findShortestPath(fileReader.getStartCity(), fileReader.getEndCity(), outputFileName);
     }
 }

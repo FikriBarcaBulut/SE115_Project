@@ -1,4 +1,5 @@
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class FileReaderDemo {
@@ -15,23 +16,23 @@ public class FileReaderDemo {
 
             numCities = Integer.parseInt(scanner.nextLine().trim());
             if (numCities <= 0) {
-                throw new IllegalArgumentException("Number of Cities Must Be Positive.");
+                throw new IllegalArgumentException("Number of Cities Must Be Positive");
             }
 
             cities = scanner.nextLine().trim().split("\\s+");
             if (cities.length != numCities) {
-                throw new IllegalArgumentException("City Count Doesn't Match The Number of City Labels Provided.");
+                throw new IllegalArgumentException("City Count Doesn't Match The Number of City Labels Provided");
             }
 
             numRoutes = Integer.parseInt(scanner.nextLine().trim());
             if (numRoutes < 0) {
-                throw new IllegalArgumentException("Number of Routes Cannot Be Negative.");
+                throw new IllegalArgumentException("Number of Routes Cannot Be Negative");
             }
 
             routes = new String[numRoutes][3];
             for (int i = 0; i < numRoutes; i++) {
                 if (!scanner.hasNextLine()) {
-                    throw new IllegalArgumentException("Insufficient Route Data.");
+                    throw new IllegalArgumentException("Insufficient Route Data");
                 }
                 String route = scanner.nextLine().trim();
                 if (!route.matches("[A-Za-z]\\s+[A-Za-z]\\s+\\d+")) {
@@ -45,7 +46,7 @@ public class FileReaderDemo {
             }
 
             if (!scanner.hasNextLine()) {
-                throw new IllegalArgumentException("Missing Start and End Cities.");
+                throw new IllegalArgumentException("Missing Start and End Cities");
             }
             String[] startEnd = scanner.nextLine().trim().split("\\s+");
             if (startEnd.length != 2) {
@@ -57,8 +58,12 @@ public class FileReaderDemo {
             System.out.println("File Read is Successful");
             return true;
 
-        } catch (Exception e) {
-            System.out.println("!!!ERROR!!! " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Invalid Number Format in The File");
+        } catch (IOException e) {
+            System.out.println("Error Reading The File: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
         return false;
     }

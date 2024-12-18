@@ -1,6 +1,5 @@
 public class MappingMain {
     public static void main(String[] args) {
-
         if (args.length < 1) {
             System.out.println("You Must Enter a File Name");
             return;
@@ -8,14 +7,13 @@ public class MappingMain {
 
         FileReaderDemo fileReader = new FileReaderDemo();
         if (!fileReader.readInputFile(args[0])) {
-            System.out.println("Error reading the input file.");
+            System.out.println("Error Reading The Input File");
             return;
         }
 
         int numCities = fileReader.getNumCities();
         CountryMap map = new CountryMap(numCities);
         String[] cities = fileReader.getCities();
-
         for (int i = 0; i < numCities; i++) {
             map.addCity(cities[i], 10);
         }
@@ -28,13 +26,7 @@ public class MappingMain {
             map.addRoute(city1, city2, time);
         }
 
-        System.out.println("Map successfully created:");
-
-        Cities[] allCities = map.getAllCities();
-        for (int i = 0; i < allCities.length; i++) {
-            if (allCities[i] != null) {
-                System.out.println(allCities[i]);
-            }
-        }
+        WayFinder wayFinder = new WayFinder(map);
+        wayFinder.findShortestPath(fileReader.getStartCity(), fileReader.getEndCity());
     }
 }

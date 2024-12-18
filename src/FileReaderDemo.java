@@ -1,5 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Scanner;
 
 public class FileReaderDemo {
@@ -12,24 +11,29 @@ public class FileReaderDemo {
     private String endCity;
 
     public boolean readInputFile(String fileName) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+        try (Scanner scanner = new Scanner(new File(fileName))) {
 
-            numCities = Integer.parseInt(reader.readLine().trim());
+            numCities = Integer.parseInt(scanner.nextLine().trim());
             if (numCities <= 0) {
                 throw new IllegalArgumentException("Number of Cities Must Be Positive.");
             }
-            cities = reader.readLine().trim().split("\\s+");
+
+            cities = scanner.nextLine().trim().split("\\s+");
             if (cities.length != numCities) {
                 throw new IllegalArgumentException("City Count Doesn't Match The Number of City Labels Provided.");
             }
-            numRoutes = Integer.parseInt(reader.readLine().trim());
+
+            numRoutes = Integer.parseInt(scanner.nextLine().trim());
             if (numRoutes < 0) {
                 throw new IllegalArgumentException("Number of Routes Cannot Be Negative.");
             }
 
             routes = new String[numRoutes][3];
             for (int i = 0; i < numRoutes; i++) {
-                String route = reader.readLine().trim();
+                if (!scanner.hasNextLine()) {
+                    throw new IllegalArgumentException("Insufficient Route Data.");
+                }
+                String route = scanner.nextLine().trim();
                 if (!route.matches("[A-Za-z]\\s+[A-Za-z]\\s+\\d+")) {
                     System.out.println("Error Line " + (i + 4) + ": Invalid Route Format");
                     return false;
@@ -40,7 +44,10 @@ public class FileReaderDemo {
                 routes[i][2] = routeParts[2];
             }
 
-            String[] startEnd = reader.readLine().trim().split("\\s+");
+            if (!scanner.hasNextLine()) {
+                throw new IllegalArgumentException("Missing Start and End Cities.");
+            }
+            String[] startEnd = scanner.nextLine().trim().split("\\s+");
             if (startEnd.length != 2) {
                 throw new IllegalArgumentException("Start and End Cities Must Be Specified Correctly");
             }
@@ -51,7 +58,7 @@ public class FileReaderDemo {
             return true;
 
         } catch (Exception e) {
-            System.out.println("!!!ERROR!!!");
+            System.out.println("!!!ERROR!!! " + e.getMessage());
         }
         return false;
     }
@@ -76,10 +83,11 @@ public class FileReaderDemo {
     }
 
     public static void main(String[] args) {
+        Scanner consoleScanner = new Scanner(System.in);
 
-        Scanner input = new Scanner(System.in);
         System.out.print("Enter The File Path: ");
-        String fileName = input.nextLine();
+        String fileName = consoleScanner.nextLine();
+
         FileReaderDemo fileReader = new FileReaderDemo();
         boolean success = fileReader.readInputFile(fileName);
 
@@ -92,10 +100,11 @@ public class FileReaderDemo {
             System.out.println("\nRoutes:");
             String[][] routes = fileReader.getRoutes();
             for (int i = 0; i < fileReader.getNumRoutes(); i++) {
-                System.out.printf("%s -> %s : %s\n", routes[i][0], routes[i][1], routes[i][2]);
+                System.out.printf("%s >>> %s : %s\n", routes[i][0], routes[i][1], routes[i][2]);
             }
             System.out.println("Start City: " + fileReader.getStartCity());
             System.out.println("End City: " + fileReader.getEndCity());
         }
+
     }
 }
